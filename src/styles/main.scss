@@ -1,0 +1,117 @@
+@import './variables';
+
+// CSS Reset (simple modern)
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html, body {
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  background: $background;
+  color: $text;
+  min-height: 100vh;
+}
+a {
+  color: $primary;
+  text-decoration: none;
+  transition: color 0.2s;
+  &:hover {
+    color: $secondary;
+  }
+}
+
+// Utility classes
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: $space-lg;
+}
+.card {
+  background: $surface;
+  border-radius: $radius;
+  box-shadow: $shadow;
+  padding: $space-lg;
+  transition: box-shadow 0.2s, transform 0.2s;
+  border: 1px solid $border;
+  &:hover {
+    box-shadow: $shadow-lg;
+    transform: translateY(-2px) scale(1.01);
+  }
+}
+.btn {
+  display: inline-block;
+  padding: $space-sm $space-md;
+  border-radius: $radius-sm;
+  border: none;
+  background: $primary;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 2px rgba(30,64,175,0.06);
+  &:hover, &:focus {
+    background: $primary-dark;
+    box-shadow: 0 2px 8px rgba(30,64,175,0.10);
+  }
+}
+.btn-secondary {
+  background: $secondary;
+  color: #fff;
+  &:hover, &:focus {
+    background: darken($secondary, 10%);
+  }
+}
+.input, .textarea, .select {
+  width: 100%;
+  padding: $space-sm $space-md;
+  border-radius: $radius-sm;
+  border: 1px solid $border;
+  background: #f3f4f6;
+  color: $text;
+  font-size: 1rem;
+  margin-bottom: $space-md;
+  transition: border 0.2s;
+  &:focus {
+    border-color: $primary;
+    outline: none;
+  }
+}
+.label {
+  font-weight: 500;
+  color: $text-light;
+  margin-bottom: $space-xs;
+  display: block;
+}
+// Badge
+.badge {
+  display: inline-block;
+  padding: 0.25em 0.75em;
+  border-radius: 999px;
+  font-size: 0.85em;
+  font-weight: 600;
+  background: $border;
+  color: $text-light;
+  margin-right: $space-sm;
+}
+// Responsive grid
+.grid {
+  display: grid;
+  gap: $space-lg;
+}
+.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+@media (max-width: 900px) {
+  .grid-2, .grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+// Utility for spacing
+.mt-lg { margin-top: $space-lg; }
+.mb-lg { margin-bottom: $space-lg; }
+.pt-lg { padding-top: $space-lg; }
+.pb-lg { padding-bottom: $space-lg; }

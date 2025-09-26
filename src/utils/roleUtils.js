@@ -1,9 +1,14 @@
 // Utility functions for role-based access control
 
+
 export const ROLES = {
   ADMIN: 'admin',
+  QA: 'qa',
+  DEVELOPER: 'developer',
+  PROJECT_MANAGER: 'pm',
   USER: 'user'
 };
+
 
 export const PERMISSIONS = {
   CREATE_PROJECT: 'create_project',
@@ -12,8 +17,17 @@ export const PERMISSIONS = {
   MANAGE_BUGS: 'manage_bugs',
   ASSIGN_BUGS: 'assign_bugs',
   DELETE_BUGS: 'delete_bugs',
-  UPLOAD_FILES: 'upload_files'
+  UPLOAD_FILES: 'upload_files',
+  CREATE_BUG: 'create_bug',
+  UPLOAD_BUG_ATTACHMENT: 'upload_bug_attachment',
+  VIEW_ASSIGNMENTS: 'view_assignments',
+  VIEW_ATTACHMENTS: 'view_attachments',
+  UPDATE_STATUS: 'update_status',
+  MARK_COMPLETE: 'mark_complete',
+  REASSIGN_BUG: 'reassign_bug',
+  MANAGE_ROLES: 'manage_roles',
 };
+
 
 // Define role permissions
 const rolePermissions = {
@@ -24,12 +38,34 @@ const rolePermissions = {
     PERMISSIONS.MANAGE_BUGS,
     PERMISSIONS.ASSIGN_BUGS,
     PERMISSIONS.DELETE_BUGS,
-    PERMISSIONS.UPLOAD_FILES
+    PERMISSIONS.UPLOAD_FILES,
+    PERMISSIONS.CREATE_BUG,
+    PERMISSIONS.UPLOAD_BUG_ATTACHMENT,
+    PERMISSIONS.VIEW_ASSIGNMENTS,
+    PERMISSIONS.VIEW_ATTACHMENTS,
+    PERMISSIONS.UPDATE_STATUS,
+    PERMISSIONS.MARK_COMPLETE,
+    PERMISSIONS.REASSIGN_BUG,
+    PERMISSIONS.MANAGE_ROLES
   ],
-  [ROLES.USER]: [
-    PERMISSIONS.MANAGE_BUGS,
-    PERMISSIONS.UPLOAD_FILES
-  ]
+  [ROLES.QA]: [
+    PERMISSIONS.CREATE_BUG,
+    PERMISSIONS.UPLOAD_BUG_ATTACHMENT,
+    PERMISSIONS.ASSIGN_BUGS,
+    PERMISSIONS.MARK_COMPLETE,
+    PERMISSIONS.REASSIGN_BUG,
+    PERMISSIONS.VIEW_ASSIGNMENTS,
+    PERMISSIONS.VIEW_ATTACHMENTS
+  ],
+  [ROLES.DEVELOPER]: [
+    PERMISSIONS.UPDATE_STATUS,
+    PERMISSIONS.VIEW_ASSIGNMENTS,
+    PERMISSIONS.VIEW_ATTACHMENTS
+  ],
+  [ROLES.PROJECT_MANAGER]: [
+    PERMISSIONS.VIEW_ASSIGNMENTS
+  ],
+  [ROLES.USER]: []
 };
 
 // Check if user has permission

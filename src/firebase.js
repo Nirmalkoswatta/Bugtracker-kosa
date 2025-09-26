@@ -6,12 +6,12 @@ import { getDatabase } from "firebase/database";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCnJNDPGUqHw-Ok6da4louF8d2u45mJGzw",
-  authDomain: "rentmedb-f3da6.firebaseapp.com",
-  projectId: "rentmedb-f3da6",
-  storageBucket: "rentmedb-f3da6.appspot.com",
-  messagingSenderId: "33370459489",
-  appId: "1:33370459489:web:your-app-id",
+  apiKey: "AIzaSyAXdqXjri1UH7d79qCLr2oEwHnABjn8dcM",
+  authDomain: "bug-tracker-updated.firebaseapp.com",
+  projectId: "bug-tracker-updated",
+  storageBucket: "bug-tracker-updated.appspot.com",
+  messagingSenderId: "40171616795",
+  appId: "1:40171616795:web:your-app-id",
   measurementId: "G-your-measurement-id"
 };
 

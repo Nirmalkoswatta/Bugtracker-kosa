@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect } from "react";
 import { ref, push, set, onValue } from "firebase/database";
 import { db } from "../firebase";
 import { useSelector } from "react-redux";
+import { hasPermission, PERMISSIONS } from "../utils/roleUtils";
 
 export default function AddBugForm({ projectId, onSuccess }) {
   const [title, setTitle] = useState("");
@@ -12,6 +14,9 @@ export default function AddBugForm({ projectId, onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const user = useSelector(state => state.user.user);
+  const canCreateBug = hasPermission(user?.role, PERMISSIONS.CREATE_BUG);
+  // File state for attachment
+  const [file, setFile] = useState(null);
 
   // Fetch project members for assignment dropdown
   useEffect(() => {
@@ -26,9 +31,22 @@ export default function AddBugForm({ projectId, onSuccess }) {
     return () => unsubscribe();
   }, [projectId]);
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    if (!canCreateBug) {
+      setError("You do not have permission to create bugs.");
+      return;
+    }
+    // File type validation
+    if (file) {
+      const allowedTypes = ["image/png", "image/jpeg", "application/pdf"];
+      if (!allowedTypes.includes(file.type)) {
+        setError("Only PNG, JPG, or PDF files are allowed as attachments.");
+        return;
+      }
+    }
     setLoading(true);
     try {
       const bugsRef = ref(db, `projects/${projectId}/bugs`);
@@ -50,6 +68,7 @@ export default function AddBugForm({ projectId, onSuccess }) {
       setDescription("");
       setSeverity("low");
       setAssignee("");
+      setFile(null);
       if (onSuccess) onSuccess(`Bug "${bug.title}" created successfully!`);
     } catch (err) {
       setError(err.message);
@@ -57,8 +76,15 @@ export default function AddBugForm({ projectId, onSuccess }) {
     setLoading(false);
   };
 
+  if (!canCreateBug) {
+    return (
+      <div className="card card-disabled">
+        <p className="card-message">Only QA users can create new bugs.</p>
+      </div>
+    );
+  }
   return (
-    <form className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl shadow-2xl p-6 space-y-6 hover:bg-white/15 transition-all duration-300 mb-8 animate-slide-up" onSubmit={handleSubmit}>
+    <form className="card bug-form-card" onSubmit={handleSubmit}>
       {/* Header */}
       <div className="flex items-center mb-6">
         <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-pink-500 rounded-lg mr-3 flex items-center justify-center">
@@ -155,30 +181,41 @@ export default function AddBugForm({ projectId, onSuccess }) {
         </div>
       </div>
 
+
+      {/* File Attachment */}
+      <div className="space-y-2">
+        <label className="block text-white/90 font-medium">
+          <span className="flex items-center">
+            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 0v12h8V4H6z" />
+            </svg>
+            Attachment (PNG, JPG, PDF)
+          </span>
+        </label>
+        <input
+          type="file"
+          accept=".png,.jpg,.jpeg,.pdf"
+          className="input"
+          onChange={e => setFile(e.target.files[0])}
+        />
+      </div>
+
       {/* Error Message */}
       {error && (
-        <div className="p-3 rounded-xl bg-red-500/20 border border-red-400/30 text-red-300 text-sm flex items-center animate-shake">
-          <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-          </svg>
+        <div className="error-message">
           {error}
         </div>
       )}
 
+
       {/* Submit Button */}
       <button
         type="submit"
-        className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold text-lg shadow-xl hover:from-red-600 hover:to-pink-600 transition-all duration-300 hover:scale-105 hover:shadow-2xl disabled:opacity-60 disabled:hover:scale-100 flex items-center justify-center"
+        className="btn btn-primary w-full flex items-center justify-center"
         disabled={loading}
       >
         {loading ? (
-          <>
-            <svg className="animate-spin w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-            </svg>
-            Adding Bug...
-          </>
+          <span className="loader" />
         ) : (
           <>
             <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -189,33 +226,7 @@ export default function AddBugForm({ projectId, onSuccess }) {
         )}
       </button>
 
-      {/* CSS Animations */}
-      <style jsx>{`
-        @keyframes slide-up {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          25% { transform: translateX(-5px); }
-          75% { transform: translateX(5px); }
-        }
-        
-        .animate-slide-up {
-          animation: slide-up 0.5s ease-out;
-        }
-        
-        .animate-shake {
-          animation: shake 0.5s ease-in-out;
-        }
-      `}</style>
+      {/* Modern card and error styles handled in SCSS */}
     </form>
   );
 }

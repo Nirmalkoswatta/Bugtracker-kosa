@@ -70,47 +70,73 @@ function AuthForm({ type, onSwitch }) {
       <div className="login-form-card">
         <h2 className="login-title">{isSignUp ? "Create Account" : "User Login"}</h2>
         <form onSubmit={handleSubmit}>
-          <div className="login-input-row">
+          {/* Email */}
+          <div className="login-input-row modern-input-row">
+            <input
+              type="email"
+              className="login-input"
+              placeholder="Email"
+              value={form.email}
+              onChange={e => setForm({ ...form, email: e.target.value })}
+              required
+              autoComplete="email"
+            />
             <span className="login-input-icon">
-              <svg width="32" height="32" fill="none" stroke="#18343a" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4.5"/><path d="M20 20c0-4-3.6-7-8-7s-8 3-8 7"/></svg>
+              <svg width="24" height="24" fill="none" stroke="#18343a" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4.5"/><path d="M20 20c0-4-3.6-7-8-7s-8 3-8 7"/></svg>
             </span>
-            {isSignUp && (
-              <>
-                <div className="login-input-row">
-                  <span className="login-input-icon">
-                    <svg width="32" height="32" fill="none" stroke="#18343a" strokeWidth="2" viewBox="0 0 24 24"><rect x="6" y="11" width="12" height="7" rx="3.5"/><path d="M12 15v-2.5"/><circle cx="12" cy="8" r="2"/></svg>
-                  </span>
-                  <input
-                    id="confirm"
-                    type="password"
-                    className="login-input"
-                    placeholder="Confirm Password"
-                    value={form.confirm}
-                    onChange={e => setForm({ ...form, confirm: e.target.value })}
-                    required
-                    autoComplete="new-password"
-                  />
-                </div>
-                <div className="login-input-row">
-                  <span className="login-input-icon">
-                    <svg width="32" height="32" fill="none" stroke="#18343a" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4.5"/><path d="M20 20c0-4-3.6-7-8-7s-8 3-8 7"/></svg>
-                  </span>
-                  <select
-                    className="login-input"
-                    style={{ color: '#111' }}
-                    value={form.role}
-                    onChange={e => setForm({ ...form, role: e.target.value })}
-                    required
-                  >
-                    <option value="QA">QA</option>
-                    <option value="Developer">Developer</option>
-                    <option value="Project Manager">Project Manager</option>
-                    <option value="User">User</option>
-                  </select>
-                </div>
-              </>
-            )}
           </div>
+          {/* Password */}
+          <div className="login-input-row modern-input-row">
+            <input
+              type="password"
+              className="login-input"
+              placeholder="Password"
+              value={form.password}
+              onChange={e => setForm({ ...form, password: e.target.value })}
+              required
+              autoComplete="current-password"
+            />
+            <span className="login-input-icon">
+              <svg width="24" height="24" fill="none" stroke="#18343a" strokeWidth="2" viewBox="0 0 24 24"><rect x="6" y="11" width="12" height="7" rx="3.5"/><path d="M12 15v-2.5"/><circle cx="12" cy="8" r="2"/></svg>
+            </span>
+          </div>
+          {/* Confirm Password (Sign Up only) */}
+          {isSignUp && (
+            <div className="login-input-row modern-input-row">
+              <input
+                type="password"
+                className="login-input"
+                placeholder="Confirm Password"
+                value={form.confirm}
+                onChange={e => setForm({ ...form, confirm: e.target.value })}
+                required
+                autoComplete="new-password"
+              />
+              <span className="login-input-icon">
+                <svg width="24" height="24" fill="none" stroke="#18343a" strokeWidth="2" viewBox="0 0 24 24"><rect x="6" y="11" width="12" height="7" rx="3.5"/><path d="M12 15v-2.5"/><circle cx="12" cy="8" r="2"/></svg>
+              </span>
+            </div>
+          )}
+          {/* Role (Sign Up only) */}
+          {isSignUp && (
+            <div className="login-input-row modern-input-row">
+              <select
+                className="login-input"
+                style={{ color: '#111' }}
+                value={form.role}
+                onChange={e => setForm({ ...form, role: e.target.value })}
+                required
+              >
+                <option value="QA">QA</option>
+                <option value="Developer">Developer</option>
+                <option value="Project Manager">Project Manager</option>
+                <option value="User">User</option>
+              </select>
+              <span className="login-input-icon">
+                <svg width="24" height="24" fill="none" stroke="#18343a" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4.5"/><path d="M20 20c0-4-3.6-7-8-7s-8 3-8 7"/></svg>
+              </span>
+            </div>
+          )}
           {error && (
             <div className="badge" style={{ background: '#ffe5e5', color: '#b91c1c', marginBottom: 16 }}>{error}</div>
           )}

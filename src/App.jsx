@@ -166,10 +166,19 @@ function App() {
   const user = useSelector(state => state.user.user);
   const dispatch = useDispatch();
   const { isDarkMode, colors } = useTheme();
-  // Redirect to QA dashboard after login if role is QA
+  // Redirect to dashboard based on role after login
   useEffect(() => {
-    if (user && user.role && typeof user.role === 'string' && user.role.toLowerCase() === 'qa') {
-      setPage('qa-dashboard');
+    if (user && user.role && typeof user.role === 'string') {
+      const role = user.role.toLowerCase();
+      if (role === 'qa') {
+        setPage('qa-dashboard');
+      } else if (role === 'developer') {
+        setPage('developer-dashboard');
+      } else if (role === 'project manager' || role === 'pm') {
+        setPage('pm-dashboard');
+      } else {
+        setPage('dashboard');
+      }
     }
   }, [user]);
 
@@ -307,25 +316,29 @@ function App() {
     }
     // Expose logout handler for dashboard
     window.handleLogout = handleLogout;
-    let DashboardComponent = Dashboard;
+    let DashboardComponent = null;
     if (user.role && typeof user.role === 'string') {
       const role = user.role.toLowerCase();
-      if (role === 'qa' || page === 'qa-dashboard') {
+      if (role === 'admin') {
+        DashboardComponent = Dashboard;
+      } else if (role === 'qa' || page === 'qa-dashboard') {
         DashboardComponent = require('./components/QADashboard').default;
-      } else if (role === 'developer') {
+      } else if (role === 'developer' || page === 'developer-dashboard') {
         DashboardComponent = require('./components/DeveloperDashboard').default;
-      } else if (role === 'project manager' || role === 'pm') {
+      } else if (role === 'project manager' || role === 'pm' || page === 'pm-dashboard') {
         DashboardComponent = require('./components/ProjectManagerDashboard').default;
+      } else {
+        DashboardComponent = () => <div style={{color:'#fff',padding:'2rem'}}>No dashboard available for your role.</div>;
       }
     }
-    return <>
+    return DashboardComponent ? <>
       <DashboardComponent />
       <Notification 
         message={notification.message} 
         type={notification.type}
         onClose={() => setNotification({ message: "", type: "success" })} 
       />
-    </>;
+    </> : null;
   }
   return (
     <div className="login-black-bg">

@@ -73,6 +73,7 @@ function AuthForm({ type, onSwitch }) {
           <div className="login-input-row">
             <span className="login-input-icon">
               <svg width="32" height="32" fill="none" stroke="#18343a" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4.5"/><path d="M20 20c0-4-3.6-7-8-7s-8 3-8 7"/></svg>
+            </span>
             {isSignUp && (
               <>
                 <div className="login-input-row">
@@ -109,24 +110,7 @@ function AuthForm({ type, onSwitch }) {
                 </div>
               </>
             )}
-                <span className="login-input-icon">
-                  <svg width="32" height="32" fill="none" stroke="#18343a" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4.5"/><path d="M20 20c0-4-3.6-7-8-7s-8 3-8 7"/></svg>
-                </span>
-                <select
-                  className="login-input"
-                  value={form.role}
-                  onChange={e => setForm({ ...form, role: e.target.value })}
-                  required
-                >
-                  <option value="Admin">Admin</option>
-                  <option value="QA">QA</option>
-                  <option value="Developer">Developer</option>
-                  <option value="Project Manager">Project Manager</option>
-                  <option value="User">User</option>
-                </select>
-              </div>
-            </>
-          )}
+          </div>
           {error && (
             <div className="badge" style={{ background: '#ffe5e5', color: '#b91c1c', marginBottom: 16 }}>{error}</div>
           )}

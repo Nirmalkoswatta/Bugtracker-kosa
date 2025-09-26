@@ -1,26 +1,25 @@
 import React from "react";
+import { useSelector } from "react-redux";
+// StarfallBackground from App.jsx
+function StarfallBackground() {
+  return (
+    <div className="starfall-bg">
+      {Array.from({ length: 30 }).map((_, i) => (
+        <span
+          key={i}
+          style={{
+            left: `${Math.random() * 100}vw`,
+            animationDelay: `${Math.random() * 2}s`,
+            animationDuration: `${2 + Math.random() * 2}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
 
-// Demo bug data for columns
-const bugColumns = [
-  { status: "Open", color: "#888", count: 2, bugs: [
-    { title: "Login Button Not Working", desc: "The login button on the homepage does not respond." },
-    { title: "UI glitch on dashboard", desc: "Sidebar overlaps content on mobile." },
-  ]},
-  { status: "Can't Reproduce", color: "#b3b3c6", count: 1, bugs: [
-    { title: "Incorrect Total Price in Shopping Cart", desc: "Total price sometimes shows as 0." },
-  ]},
-  { status: "In Progress", color: "#2563eb", count: 2, bugs: [
-    { title: "Incorrect Total Price in Shopping Cart", desc: "Total price sometimes shows as 0." },
-    { title: "Profile image upload fails", desc: "Error 500 when uploading large images." },
-  ]},
-  { status: "Rejected", color: "#ef4444", count: 2, bugs: [
-    { title: "Broken Links on Footer", desc: "Several links in the footer of the website are broken." },
-    { title: "Typo in About Page", desc: "Misspelled word in About page." },
-  ]},
-  { status: "Closed", color: "#22c55e", count: 1, bugs: [
-    { title: "Slow Page Load Times on Mobile", desc: "Page loads slowly on mobile devices." },
-  ]},
-];
+// No demo bug data. Use real data or leave empty.
+const bugColumns = [];
 
 export default function Dashboard() {
   // Demo summary data
@@ -30,8 +29,13 @@ export default function Dashboard() {
     inProgress: 5,
     fixed: 2,
   };
+  // Get logout handler from props or window (App passes it via window for now)
+  const handleLogout = window.handleLogout || (() => {});
+  // Get user from Redux
+  const user = useSelector(state => state.user.user);
   return (
-    <div className="bugtracker-analytics-root">
+    <div className="bugtracker-analytics-root" style={{position:'relative'}}>
+      <StarfallBackground />
       {/* Top Navbar */}
       <nav className="bugtracker-admin-navbar">
         <div className="bugtracker-admin-navbar-left">
@@ -45,7 +49,8 @@ export default function Dashboard() {
         </ul>
         <div className="bugtracker-admin-navbar-user">
           <span className="bugtracker-admin-navbar-avatar" />
-          <span className="bugtracker-admin-navbar-username">Admin</span>
+          <span className="bugtracker-admin-navbar-username">{user?.email || "Admin"}</span>
+          <button className="btn btn-secondary" style={{marginLeft:12}} onClick={handleLogout}>Logout</button>
         </div>
       </nav>
 

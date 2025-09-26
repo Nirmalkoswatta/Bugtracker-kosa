@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import BugAttachmentUpload from "./BugAttachmentUpload";
 import { getBugAttachments } from "./bugAttachmentDb";
 import { RoleGuard, useRoleAccess } from "./RoleProtection";
-import { PERMISSIONS } from "../utils/roleUtils";
+import { PERMISSIONS, ROLES, getUserRole, isProjectAdmin } from "../utils/roleUtils";
 
 const statusColors = {
   open: "bg-red-700",
@@ -20,6 +20,8 @@ export default function BugList({ projectId, project }) {
   const [filter, setFilter] = useState({ severity: "", status: "", assignee: "", search: "", sort: "createdAt-desc" });
   const user = useSelector(state => state.user.user);
   const { canAssignBugs, canUploadFiles } = useRoleAccess(project);
+  const userRole = getUserRole(user, project);
+  const isAdmin = isProjectAdmin(user, project);
 
   useEffect(() => {
     const bugsRef = ref(db, `projects/${projectId}/bugs`);
@@ -228,31 +230,28 @@ export default function BugList({ projectId, project }) {
 
               {/* Controls */}
               <div className="flex flex-wrap gap-4 items-center">
-                {/* Status Control */}
-                <div className="flex items-center gap-2">
-                  <label className="text-white/90 font-medium text-sm">Status:</label>
-                  <select
-                    className="px-3 py-1 rounded-lg backdrop-blur-sm bg-white/5 border border-white/30 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 cursor-pointer"
-                    value={bug.status}
-                    onChange={e => handleStatusChange(bug, e.target.value)}
-                  >
-                    <option value="open" className="bg-gray-800">🔓 Open</option>
-                    <option value="in-progress" className="bg-gray-800">⚡ In Progress</option>
-                    <option value="closed" className="bg-gray-800">✅ Closed</option>
-                  </select>
-                </div>
-                
-                {/* Assignment Control */}
-                <RoleGuard 
-                  user={user} 
-                  project={project} 
-                  permission={PERMISSIONS.ASSIGN_BUGS}
-                  fallback={
-                    <span className="text-white/70 text-sm">
-                      Assigned to: <span className="text-white font-medium">{bug.assignee || "Unassigned"}</span>
-                    </span>
-                  }
-                >
+                {/* Status Control: Only assigned dev or admin can update */}
+                {(isAdmin || (userRole === ROLES.DEVELOPER && bug.assignee === user.email)) ? (
+                  <div className="flex items-center gap-2">
+                    <label className="text-white/90 font-medium text-sm">Status:</label>
+                    <select
+                      className="px-3 py-1 rounded-lg backdrop-blur-sm bg-white/5 border border-white/30 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 cursor-pointer"
+                      value={bug.status}
+                      onChange={e => handleStatusChange(bug, e.target.value)}
+                    >
+                      <option value="open" className="bg-gray-800">🔓 Open</option>
+                      <option value="in-progress" className="bg-gray-800">⚡ In Progress</option>
+                      <option value="closed" className="bg-gray-800">✅ Closed</option>
+                    </select>
+                  </div>
+                ) : (
+                  <span className="text-white/70 text-sm">
+                    Status: <span className="text-white font-medium">{bug.status}</span>
+                  </span>
+                )}
+
+                {/* Assignment Control: Only QA or admin can reassign */}
+                {(isAdmin || userRole === ROLES.QA) ? (
                   <div className="flex items-center gap-2">
                     <label className="text-white/90 font-medium text-sm">Assign to:</label>
                     <select
@@ -266,22 +265,29 @@ export default function BugList({ projectId, project }) {
                       ))}
                     </select>
                   </div>
-                </RoleGuard>
+                ) : (
+                  <span className="text-white/70 text-sm">
+                    Assigned to: <span className="text-white font-medium">{bug.assignee || "Unassigned"}</span>
+                  </span>
+                )}
+
+                {/* Mark Complete: Only QA or admin */}
+                {(isAdmin || userRole === ROLES.QA) && bug.status !== 'closed' && (
+                  <button className="btn btn-success btn-xs" onClick={() => handleStatusChange(bug, 'closed')}>
+                    Mark Complete
+                  </button>
+                )}
               </div>
 
-              {/* File Upload */}
-              <RoleGuard 
-                user={user} 
-                project={project} 
-                permission={PERMISSIONS.UPLOAD_FILES}
-              >
+              {/* File Upload: Only QA or admin */}
+              {(isAdmin || userRole === ROLES.QA) && (
                 <div className="mt-4">
                   <BugAttachmentUpload projectId={projectId} bugId={bug.id} />
                 </div>
-              </RoleGuard>
+              )}
 
-              {/* Attachments */}
-              {attachments[bug.id] && attachments[bug.id].length > 0 && (
+              {/* Attachments: Only assigned dev or admin can view */}
+              {(isAdmin || (userRole === ROLES.DEVELOPER && bug.assignee === user.email)) && attachments[bug.id] && attachments[bug.id].length > 0 && (
                 <div className="mt-4">
                   <h4 className="text-white/90 font-medium mb-2 flex items-center">
                     <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">

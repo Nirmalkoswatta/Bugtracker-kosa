@@ -304,12 +304,15 @@ function App() {
     // Expose logout handler for dashboard
     window.handleLogout = handleLogout;
     let DashboardComponent = Dashboard;
-    if (user.role === 'QA') {
-      DashboardComponent = require('./components/QADashboard').default;
-    } else if (user.role === 'Developer') {
-      DashboardComponent = require('./components/DeveloperDashboard').default;
-    } else if (user.role === 'Project Manager') {
-      DashboardComponent = require('./components/ProjectManagerDashboard').default;
+    if (user.role && typeof user.role === 'string') {
+      const role = user.role.toLowerCase();
+      if (role === 'qa') {
+        DashboardComponent = require('./components/QADashboard').default;
+      } else if (role === 'developer') {
+        DashboardComponent = require('./components/DeveloperDashboard').default;
+      } else if (role === 'project manager' || role === 'pm') {
+        DashboardComponent = require('./components/ProjectManagerDashboard').default;
+      }
     }
     return <>
       <DashboardComponent />

@@ -1,6 +1,6 @@
 
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setUser } from "./store/userSlice";
 import { onAuthStateChanged } from "firebase/auth";
@@ -117,26 +117,24 @@ function AuthForm({ type, onSwitch }) {
               </span>
             </div>
           )}
-          {/* Role (Sign Up only) */}
-          {isSignUp && (
-            <div className="login-input-row modern-input-row">
-              <select
-                className="login-input"
-                style={{ color: '#111' }}
-                value={form.role}
-                onChange={e => setForm({ ...form, role: e.target.value })}
-                required
-              >
-                <option value="QA">QA</option>
-                <option value="Developer">Developer</option>
-                <option value="Project Manager">Project Manager</option>
-                <option value="User">User</option>
-              </select>
-              <span className="login-input-icon">
-                <svg width="24" height="24" fill="none" stroke="#18343a" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4.5"/><path d="M20 20c0-4-3.6-7-8-7s-8 3-8 7"/></svg>
-              </span>
-            </div>
-          )}
+          {/* Role (Sign Up and Login) */}
+          <div className="login-input-row modern-input-row">
+            <select
+              className="login-input"
+              style={{ color: '#111' }}
+              value={form.role}
+              onChange={e => setForm({ ...form, role: e.target.value })}
+              required
+            >
+              <option value="QA">QA</option>
+              <option value="Developer">Developer</option>
+              <option value="Project Manager">Project Manager</option>
+              <option value="User">User</option>
+            </select>
+            <span className="login-input-icon">
+              <svg width="24" height="24" fill="none" stroke="#18343a" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4.5"/><path d="M20 20c0-4-3.6-7-8-7s-8 3-8 7"/></svg>
+            </span>
+          </div>
           {error && (
             <div className="badge" style={{ background: '#ffe5e5', color: '#b91c1c', marginBottom: 16 }}>{error}</div>
           )}
@@ -168,6 +166,12 @@ function App() {
   const user = useSelector(state => state.user.user);
   const dispatch = useDispatch();
   const { isDarkMode, colors } = useTheme();
+  // Redirect to QA dashboard after login if role is QA
+  useEffect(() => {
+    if (user && user.role && typeof user.role === 'string' && user.role.toLowerCase() === 'qa') {
+      setPage('qa-dashboard');
+    }
+  }, [user]);
 
   const showNotification = (message, type = "success") => {
     setNotification({ message, type });
@@ -306,7 +310,7 @@ function App() {
     let DashboardComponent = Dashboard;
     if (user.role && typeof user.role === 'string') {
       const role = user.role.toLowerCase();
-      if (role === 'qa') {
+      if (role === 'qa' || page === 'qa-dashboard') {
         DashboardComponent = require('./components/QADashboard').default;
       } else if (role === 'developer') {
         DashboardComponent = require('./components/DeveloperDashboard').default;

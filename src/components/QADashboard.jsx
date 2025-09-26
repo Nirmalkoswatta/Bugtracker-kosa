@@ -4,6 +4,13 @@ import StarfallBackground from "./StarfallBackground";
 
 export default function QADashboard() {
   const user = useSelector(state => state.user.user);
+  if (!user) {
+    return (
+      <div className="bugtracker-analytics-root" style={{position:'relative', display:'flex', alignItems:'center', justifyContent:'center', minHeight:'100vh'}}>
+        <div style={{color:'#fff', fontSize:'1.2rem'}}>Loading QA Dashboard...</div>
+      </div>
+    );
+  }
   return (
     <div className="bugtracker-analytics-root" style={{position:'relative'}}>
       <StarfallBackground />
@@ -14,7 +21,7 @@ export default function QADashboard() {
         </div>
         <div className="bugtracker-admin-navbar-user">
           <span className="bugtracker-admin-navbar-avatar" />
-          <span className="bugtracker-admin-navbar-username">{user?.email || "QA"}</span>
+          <span className="bugtracker-admin-navbar-username">{user.email || "QA"}</span>
         </div>
       </nav>
       <section className="bugtracker-summary-panel">
